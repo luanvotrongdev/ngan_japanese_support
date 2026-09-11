@@ -38,7 +38,7 @@
 
   <div class="md-layout">
     <ContentList entries={data.entries} selectedKey={panel && panel.mode === 'edit' ? `${panel.type}:${panel.id}` : null} newType={panel && panel.mode === 'new' ? panel.type : null} />
-    <section class="panel detail-panel">
+    <section id="detail" class="panel detail-panel">
       {#if panel}
         <EntryDetail type={panel.type} mode={panel.mode} id={panel.id} entry={selectedEntry} form={form} />
       {:else}
