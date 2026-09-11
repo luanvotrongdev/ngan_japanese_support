@@ -1,8 +1,10 @@
 <script lang="ts">
+  import { page } from '$app/state';
   import VocabularyFields from './VocabularyFields.svelte';
   import KanjiFields from './KanjiFields.svelte';
   import GrammarFields from './GrammarFields.svelte';
   import { toLines } from '$lib/schemas/learning-content';
+  import { resolveLocale, translate } from '$lib/i18n';
 
   type ContentType = 'vocabulary' | 'kanji' | 'grammar';
   type FormState = {
@@ -21,7 +23,9 @@
     form: FormState | null;
   } = $props();
 
-  const badge: Record<ContentType, string> = { vocabulary: 'Vocabulary', kanji: 'Kanji', grammar: 'Grammar' };
+  const locale = $derived(resolveLocale(page.data.locale));
+  const t = (key: string, params?: Record<string, string>) => translate(locale, key, params);
+  const typeLower = $derived(t(`type.${type}.lower`));
   const action = $derived(`${type}/${mode === 'new' ? 'create' : 'update'}`);
   let busy = $state(false);
 
@@ -38,14 +42,14 @@
 
   function submit() { busy = true; }
   function confirmDelete(event: SubmitEvent) {
-    if (!confirm(`Delete this ${badge[type].toLowerCase()} entry?`)) event.preventDefault();
+    if (!confirm(t('confirm.deleteEntry', { type: typeLower }))) event.preventDefault();
     else busy = true;
   }
 </script>
 
 <div class="detail-panel-inner">
-  <p class="eyebrow">{badge[type]}</p>
-  <h2>{mode === 'new' ? `Add ${badge[type].toLowerCase()}` : `Edit ${badge[type].toLowerCase()}`}</h2>
+  <p class="eyebrow">{t(`type.${type}`)}</p>
+  <h2>{mode === 'new' ? t(`detail.${type}.add`) : t(`detail.${type}.edit`)}</h2>
   <form method="POST" action={`?/${action}`} onsubmit={submit}>
     {#if mode === 'edit'}<input type="hidden" name="entryId" value={id ?? ''} />{/if}
     {#if type === 'vocabulary'}
@@ -55,14 +59,14 @@
     {:else}
       <GrammarFields {values} {errors} />
     {/if}
-    <button class="primary" type="submit" disabled={busy}>{mode === 'new' ? 'Add entry' : 'Save changes'}</button>
+    <button class="primary" type="submit" disabled={busy}>{mode === 'new' ? t('btn.addEntry') : t('btn.save')}</button>
   </form>
   {#if mode === 'edit'}
     <form method="POST" action={`?/${type}/delete`} onsubmit={confirmDelete}>
       <input type="hidden" name="entryId" value={id ?? ''} />
       <input type="hidden" name="confirmation" value="delete" />
       {#if form?.action === `${type}/delete` && form?.message}<p class="field-error">{form.message}</p>{/if}
-      <button class="danger" type="submit" disabled={busy}>Delete {badge[type].toLowerCase()}</button>
+      <button class="danger" type="submit" disabled={busy}>{t('btn.deleteEntry', { type: typeLower })}</button>
     </form>
   {/if}
 </div>

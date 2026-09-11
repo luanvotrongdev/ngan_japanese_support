@@ -26,3 +26,9 @@
 Every content row belongs to exactly one study session. Ownership is established through
 the parent session and checked in every query. Writes use transactions where an operation
 touches multiple rows. Timestamps transition on creation and successful update only.
+
+## UI Preferences
+- The active UI language is a client preference, not relational data: it is stored in a
+  `lang` cookie (`vi` default, `en` override) and read by server actions, SSR, and the
+  client to select dictionary values. No language columns exist on any entity because
+  localization covers UI strings only; learner content is stored and rendered as typed.

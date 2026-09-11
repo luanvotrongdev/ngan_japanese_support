@@ -1,31 +1,31 @@
 import { z } from 'zod';
 
-const required = (label: string) => z.string().trim().min(1, `${label} is required`).max(2000);
-const optional = z.string().trim().max(4000).transform((value) => value || null);
+const required = (field: string) => z.string().trim().min(1, `required:${field}`).max(2000, `tooLong:${field}`);
+const optional = (field: string) => z.string().trim().max(4000, `tooLong:${field}`).transform((value) => value || null);
 const list = z.string().transform((value) => value.split('\n').map((item) => item.trim()).filter(Boolean));
 
 export const vocabularySchema = z.object({
-  vocabulary: required('Vocabulary'),
-  reading: required('Reading'),
-  meaning: required('Meaning'),
-  nuance: optional,
+  vocabulary: required('vocabulary'),
+  reading: required('reading'),
+  meaning: required('meaning'),
+  nuance: optional('nuance'),
   examples: list
 });
 
 export const kanjiSchema = z.object({
-  kanji: required('Kanji'),
+  kanji: required('kanji'),
   onyomi: list,
   kunyomi: list,
-  meaning: required('Meaning'),
+  meaning: required('meaning'),
   relatedVocabulary: list,
   examples: list
 });
 
 export const grammarSchema = z.object({
-  grammar: required('Grammar'),
-  usage: required('Usage'),
-  meaning: required('Meaning'),
-  nuance: optional,
+  grammar: required('grammar'),
+  usage: required('usage'),
+  meaning: required('meaning'),
+  nuance: optional('nuance'),
   examples: list
 });
 

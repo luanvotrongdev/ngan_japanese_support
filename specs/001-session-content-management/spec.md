@@ -10,6 +10,10 @@
 - Q: How should Vocabulary, Kanji, and Grammar be arranged on the screen? → A: Single page with master-detail (list on left, detail on right)
 - Q: How should error, empty, and loading states be presented to the user? → A: Inline display for all states (validation errors, empty placeholders, loading indicators within the same area)
 - Q: How should the master list combine the three content types? → A: Combined list with type badge/tag on each entry
+- Q: What should localization cover? → A: UI strings only; stored learner content (titles, notes, meanings) stays as typed with no per-language storage or translation
+- Q: How should the app decide the initial UI language and switch it? → A: Manual language toggle; app defaults to Vietnamese until switched; no automatic detection
+- Q: Should server-generated messages be localized? → A: Yes; validation/confirmation messages from form actions use a shared Vietnamese dictionary on client and server, with English fallback for untranslated keys
+- Q: How should created/updated timestamps be handled? → A: Locale-aware formatting via Intl.DateTimeFormat matching the active UI language
 
 ## User Scenarios & Testing *(mandatory)*
 
@@ -65,6 +69,12 @@ A learner manages grammar patterns with usage, meaning, nuance, and ordered exam
 - Empty list items are discarded while order is retained.
 - Unicode Japanese text is stored and displayed unchanged.
 - Deleting a session cascades to all three content types.
+- Navigation to an untranslated key falls back to English rather than displaying a raw key.
+
+### Localization
+- UI language is selected manually; the app loads in Vietnamese by default and switches to English via a header toggle.
+- Localization applies to application strings only; learner-authored content values are not translated.
+- A single shared dictionary (Vietnamese primary, English fallback) is used by client components and server form actions.
 
 ### Screen Hierarchy
 - The application will use a single page with a master-detail layout for managing and viewing Vocabulary, Kanji, and Grammar content within a session. The list of entries (master) will be on the left, and the detail/edit form (detail) will be on the right.
@@ -88,6 +98,11 @@ A learner manages grammar patterns with usage, meaning, nuance, and ordered exam
 - **FR-008**: Required fields MUST reject blank values without discarding valid submitted data.
 - **FR-009**: Session deletion MUST require confirmation and delete contained content atomically.
 - **FR-010**: The feature MUST persist content across application restarts.
+- **FR-011**: The system MUST localize all UI strings (navigation, buttons, headings, empty/error/loading messages, confirmations) into Vietnamese and English.
+- **FR-012**: The UI MUST default to Vietnamese and provide a manual toggle to switch to English and back; automatic locale detection is out of scope.
+- **FR-013**: Server-generated validation and confirmation messages MUST resolve through the same localization dictionary as client UI, using the active language with English fallback for untranslated keys.
+- **FR-014**: Session created/updated timestamps MUST render with locale-aware formatting matching the active UI language.
+- **FR-015**: Stored learner content (session titles, notes, vocabulary/kanji/grammar meanings) MUST remain exactly as typed and MUST NOT be translated or transformed by localization.
 
 ### Key Entities
 - **User**: The owner identity for private study data.
@@ -104,6 +119,7 @@ A learner manages grammar patterns with usage, meaning, nuance, and ordered exam
 - **SC-003**: All tested attempts to access another learner's data are rejected.
 - **SC-004**: Normal session and content operations visibly complete within two seconds.
 - **SC-005**: At least 95% of test participants complete each CRUD journey without assistance.
+- **SC-006**: With the default Vietnamese UI and after toggling to English, all user-visible strings resolve to a translated value (zero raw-key fallbacks) across both languages.
 
 ## Assumptions
 - Session and lesson refer to the same lesson container in this feature.
@@ -111,3 +127,4 @@ A learner manages grammar patterns with usage, meaning, nuance, and ordered exam
 - Nuance and examples are optional; core identity and meaning fields are required.
 - Duplicate entries are allowed because context and meaning may differ.
 - Quiz generation, grading, AI content generation, and progress tracking are out of scope.
+- Content fields are authored in the learner's language and are not translated by localization.

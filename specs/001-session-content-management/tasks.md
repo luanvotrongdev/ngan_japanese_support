@@ -7,7 +7,8 @@
 **Tests**: Repository integration tests and browser e2e journeys are included for each user
 story because the project constitution (`.specify/memory/constitution.md`, Principle V)
 mandates automated tests for ownership boundaries, persistence, and the primary CRUD
-journeys, and `quickstart.md` validates `bun run test` and `bun run test:e2e`.
+journeys, and `quickstart.md` validates `bun run test` and `bun run test:e2e`. The
+localization phase adds dictionary unit tests and a language-toggle e2e journey for SC-006.
 
 **Organization**: Tasks are grouped by user story to enable independent implementation and
 testing of each story under the single master-detail page architecture.
@@ -157,6 +158,51 @@ independently testable.
 
 ---
 
+## Phase 8: Localization (Cross-Cutting Concerns)
+
+**Goal**: Localize the whole application UI into Vietnamese (default) and English with a
+manual header toggle, locale-aware timestamps, and localized server validation/confirmation
+messages, while learner-authored content stays as typed (spec FR-011 to FR-015, SC-006).
+
+**Independent Test**: Load the app and confirm Vietnamese is the default; toggle to English
+and back; confirm UI strings, validation messages, delete confirmations, and timestamps
+switch language while stored content values remain unchanged.
+
+### Tests for Localization ⚠️
+
+> **NOTE**: Write these tests FIRST, ensure they FAIL before the implementation exists.
+
+- [x] T039 [P] Add i18n unit tests in `tests/unit/i18n.test.ts` for full key coverage in
+  both languages, English fallback for untranslated keys, and cookie-based locale resolution
+
+### Implementation for Localization
+
+- [x] T040 [P] Create the shared Vietnamese and English dictionaries in `src/lib/i18n/dictionaries.ts`
+  covering every UI string (layout, sessions, master list, detail panel, field labels, buttons, confirms, validation messages)
+- [x] T041 [P] Add typed i18n helpers and cookie-based locale resolution in `src/lib/i18n/index.ts`
+  (safe on client and server, English fallback per FR-013)
+- [x] T042 [P] Build the manual language toggle in `src/lib/components/LanguageToggle.svelte`
+  (posts `lang` to `/set-language`, reflects the active language)
+- [x] T043 Implement the `set-language` action on the dedicated `src/routes/set-language/+page.server.ts`
+  route setting the `lang` cookie (per `contracts/form-actions.md`; SvelteKit disallows form
+  actions in layout server files, so the action lives on its own route)
+- [x] T044 Wire the active locale through the root layout and render `LanguageToggle.svelte` in `src/routes/+layout.svelte` and `src/routes/+layout.server.ts`
+- [x] T045 Localize the session list/create page and its server messages in `src/routes/sessions/+page.svelte` and `src/routes/sessions/+page.server.ts`
+- [x] T046 Localize master-detail components `src/lib/components/ContentList.svelte`, `EntryDetail.svelte`,
+  `VocabularyFields.svelte`, `KanjiFields.svelte`, `GrammarFields.svelte`, and the session detail page `src/routes/sessions/[sessionId]/+page.svelte`
+- [x] T047 Localize server form-action validation/confirmation messages in `src/routes/sessions/[sessionId]/+page.server.ts`
+  and the session delete confirmation flow (shared dictionary, FR-013)
+- [x] T048 Render created/updated timestamps with `Intl.DateTimeFormat` for the active locale in
+  `src/routes/sessions/+page.svelte` and `src/routes/sessions/[sessionId]/+page.svelte` (FR-014)
+- [x] T049 Add the localization browser journey in `e2e/localization.spec.ts` (Vietnamese default,
+  toggle to English, localized validation/confirmation, locale-aware timestamps, content preserved)
+- [x] T050 Update `README.md` and `specs/001-session-content-management/quickstart.md` and record
+  re-run validation results for the localization build
+
+**Checkpoint**: The full UI is localized; SC-006 (zero raw-key fallbacks) and FR-011 to FR-015 pass.
+
+---
+
 ## Dependencies & Execution Order
 
 ### Phase Dependencies
@@ -166,6 +212,8 @@ independently testable.
 - **User Stories (Phase 3+)**: All depend on Foundational phase completion.
   - US1 builds the page shell and combined master list; US2-US4 extend it in priority order.
 - **Polish (Phase 7)**: Depends on all user stories being complete.
+- **Localization (Phase 8)**: Depends on all user stories being complete; touches no data-model
+  or persistence, so it can be delivered atop the finished master-detail app.
 
 ### User Story Dependencies
 
@@ -194,6 +242,10 @@ independently testable.
 - Once US1 components exist, US2, US3, and US4 service/component tasks (T021/T022, T026/T027
   T031/T032) run in parallel; action-wiring tasks (T023, T028, T033) are separate files of
   work by appending to the same server file.
+- Localization dictionary, helpers, toggle, and unit-test tasks (T039-T042) run in parallel on
+  separate files; the layout action (T043) depends on the toggle, and server-message tasks
+  (T045, T047) and component tasks (T044, T046, T048) depend on the dictionary and helpers
+  (T040, T041).
 
 ---
 
@@ -229,6 +281,7 @@ Task: "Build kanji fields in src/lib/components/KanjiFields.svelte"
 4. Add User Story 3 → kanji joins the list → Test independently.
 5. Add User Story 4 → grammar joins the list → Test independently.
 6. Polish (Phase 7) → responsive/accessible presentation, e2e coverage, README, validation.
+7. Localize (Phase 8) → Vietnamese default, English toggle, localized messages, locale-aware timestamps.
 
 ### Parallel Team Strategy
 

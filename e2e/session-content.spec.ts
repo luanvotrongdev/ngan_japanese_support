@@ -2,6 +2,7 @@ import { expect, test } from '@playwright/test';
 
 test('manages all content types on a single session page', async ({ page }) => {
   page.on('dialog', (dialog) => dialog.accept());
+  await page.context().addCookies([{ name: 'lang', value: 'en', domain: '127.0.0.1', path: '/' }]);
   const sessionTitle = `JLPT N5 review ${Date.now()}`;
   await page.goto('/sessions');
   await page.waitForLoadState('networkidle');

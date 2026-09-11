@@ -1,4 +1,6 @@
 <script lang="ts">
+  import { page } from '$app/state';
+  import { resolveLocale, translate } from '$lib/i18n';
   type ContentType = 'vocabulary' | 'kanji' | 'grammar';
   type Entry = { type: ContentType; id: string; title: string; subtitle: string };
 
@@ -8,16 +10,16 @@
     newType: ContentType | null;
   } = $props();
 
-  const badge: Record<ContentType, string> = { vocabulary: 'Vocabulary', kanji: 'Kanji', grammar: 'Grammar' };
-  const addLabel: Record<ContentType, string> = { vocabulary: 'Add vocabulary', kanji: 'Add kanji', grammar: 'Add grammar' };
+  const locale = $derived(resolveLocale(page.data.locale));
+  const t = (key: string, params?: Record<string, string>) => translate(locale, key, params);
   const typeOrder: ContentType[] = ['vocabulary', 'kanji', 'grammar'];
 </script>
 
-<nav class="content-list" aria-label="Session content">
-  <header><div><p class="eyebrow">Session content</p><h2>All entries</h2></div><span>{entries.length} total</span></header>
+<nav class="content-list" aria-label={t('content.aria')}>
+  <header><div><p class="eyebrow">{t('content.eyebrow')}</p><h2>{t('content.title')}</h2></div><span>{t('content.total', { count: String(entries.length) })}</span></header>
   <div class="add-row">
     {#each typeOrder as type}
-      <a href={`?new=${type}#detail`} class:active={newType === type}>{addLabel[type]}</a>
+      <a href={`?new=${type}#detail`} class:active={newType === type}>{t(`detail.${type}.add`)}</a>
     {/each}
   </div>
   {#if entries.length}
@@ -25,7 +27,7 @@
       {#each entries as entry}{@const key = `${entry.type}:${entry.id}`}
         <li>
           <a class="entry-row" class:selected={key === selectedKey} href={`?entry=${key}#detail`} aria-current={key === selectedKey ? 'true' : undefined}>
-            <span class="badge {entry.type}">{badge[entry.type]}</span>
+            <span class="badge {entry.type}">{t(`type.${entry.type}`)}</span>
             <span class="entry-title">{entry.title}</span>
             <span class="entry-subtitle">{entry.subtitle}</span>
           </a>
@@ -33,6 +35,6 @@
       {/each}
     </ul>
   {:else}
-    <p class="empty">No vocabulary, kanji, or grammar yet. Use the buttons above to add the first entry.</p>
+    <p class="empty">{t('content.empty')}</p>
   {/if}
 </nav>

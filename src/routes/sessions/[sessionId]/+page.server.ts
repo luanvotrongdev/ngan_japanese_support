@@ -7,8 +7,11 @@ import { createVocabulary, deleteVocabulary, updateVocabulary } from '$lib/serve
 import { createKanji, deleteKanji, updateKanji } from '$lib/server/study-sessions/kanji';
 import { createGrammar, deleteGrammar, updateGrammar } from '$lib/server/study-sessions/grammar';
 import { formErrors, formValues } from '$lib/server/study-sessions/forms';
+import { localizeErrors, resolveLocale, translate } from '$lib/i18n';
 
 type ContentType = 'vocabulary' | 'kanji' | 'grammar';
+
+const localeOf = (event: RequestEvent) => resolveLocale(event.cookies.get('lang'));
 
 export const load: PageServerLoad = ({ locals, params }) => {
   const { session, vocabulary, kanji, grammar } = getSessionContent(locals.user.id, params.sessionId);
@@ -26,17 +29,20 @@ const contentActions = (type: ContentType) => ({
     const values = formValues(await event.request.formData());
     if (type === 'vocabulary') {
       const parsed = vocabularySchema.safeParse(values);
-      if (!parsed.success) return fail(400, { action: `${type}/create`, values, errors: formErrors(parsed.error) });
+      if (!parsed.success)
+        return fail(400, { action: `${type}/create`, values, errors: localizeErrors(formErrors(parsed.error), localeOf(event)) });
       const id = createVocabulary(event.locals.user.id, event.params.sessionId, parsed.data);
       redirect(303, `/sessions/${event.params.sessionId}?entry=${type}:${id}`);
     } else if (type === 'kanji') {
       const parsed = kanjiSchema.safeParse(values);
-      if (!parsed.success) return fail(400, { action: `${type}/create`, values, errors: formErrors(parsed.error) });
+      if (!parsed.success)
+        return fail(400, { action: `${type}/create`, values, errors: localizeErrors(formErrors(parsed.error), localeOf(event)) });
       const id = createKanji(event.locals.user.id, event.params.sessionId, parsed.data);
       redirect(303, `/sessions/${event.params.sessionId}?entry=${type}:${id}`);
     } else {
       const parsed = grammarSchema.safeParse(values);
-      if (!parsed.success) return fail(400, { action: `${type}/create`, values, errors: formErrors(parsed.error) });
+      if (!parsed.success)
+        return fail(400, { action: `${type}/create`, values, errors: localizeErrors(formErrors(parsed.error), localeOf(event)) });
       const id = createGrammar(event.locals.user.id, event.params.sessionId, parsed.data);
       redirect(303, `/sessions/${event.params.sessionId}?entry=${type}:${id}`);
     }
@@ -46,17 +52,20 @@ const contentActions = (type: ContentType) => ({
     const entryId = String(values.entryId ?? '');
     if (type === 'vocabulary') {
       const parsed = vocabularySchema.safeParse(values);
-      if (!parsed.success) return fail(400, { action: `${type}/update`, entryId, values, errors: formErrors(parsed.error) });
+      if (!parsed.success)
+        return fail(400, { action: `${type}/update`, entryId, values, errors: localizeErrors(formErrors(parsed.error), localeOf(event)) });
       updateVocabulary(event.locals.user.id, event.params.sessionId, entryId, parsed.data);
       redirect(303, `/sessions/${event.params.sessionId}?entry=${type}:${entryId}`);
     } else if (type === 'kanji') {
       const parsed = kanjiSchema.safeParse(values);
-      if (!parsed.success) return fail(400, { action: `${type}/update`, entryId, values, errors: formErrors(parsed.error) });
+      if (!parsed.success)
+        return fail(400, { action: `${type}/update`, entryId, values, errors: localizeErrors(formErrors(parsed.error), localeOf(event)) });
       updateKanji(event.locals.user.id, event.params.sessionId, entryId, parsed.data);
       redirect(303, `/sessions/${event.params.sessionId}?entry=${type}:${entryId}`);
     } else {
       const parsed = grammarSchema.safeParse(values);
-      if (!parsed.success) return fail(400, { action: `${type}/update`, entryId, values, errors: formErrors(parsed.error) });
+      if (!parsed.success)
+        return fail(400, { action: `${type}/update`, entryId, values, errors: localizeErrors(formErrors(parsed.error), localeOf(event)) });
       updateGrammar(event.locals.user.id, event.params.sessionId, entryId, parsed.data);
       redirect(303, `/sessions/${event.params.sessionId}?entry=${type}:${entryId}`);
     }
@@ -64,7 +73,8 @@ const contentActions = (type: ContentType) => ({
   [`${type}/delete`]: async (event: RequestEvent) => {
     const values = formValues(await event.request.formData());
     const entryId = String(values.entryId ?? '');
-    if (values.confirmation !== 'delete') return fail(400, { action: `${type}/delete`, entryId, message: 'Deletion was not confirmed' });
+    if (values.confirmation !== 'delete')
+      return fail(400, { action: `${type}/delete`, entryId, message: translate(localeOf(event), 'server.deleteConfirm') });
     if (type === 'vocabulary') deleteVocabulary(event.locals.user.id, event.params.sessionId, entryId);
     else if (type === 'kanji') deleteKanji(event.locals.user.id, event.params.sessionId, entryId);
     else deleteGrammar(event.locals.user.id, event.params.sessionId, entryId);
@@ -73,15 +83,17 @@ const contentActions = (type: ContentType) => ({
 });
 
 export const actions: Actions = {
-  update: async ({ request, locals, params }) => {
+  update: async ({ request, locals, params, cookies }) => {
     const values = formValues(await request.formData());
     const parsed = studySessionSchema.safeParse(values);
-    if (!parsed.success) return fail(400, { action: 'update', values, errors: formErrors(parsed.error) });
+    if (!parsed.success)
+      return fail(400, { action: 'update', values, errors: localizeErrors(formErrors(parsed.error), resolveLocale(cookies.get('lang'))) });
     updateSession(locals.user.id, params.sessionId, parsed.data);
     redirect(303, `/sessions/${params.sessionId}`);
   },
-  delete: async ({ request, locals, params }) => {
-    if ((await request.formData()).get('confirmation') !== 'delete') return fail(400, { action: 'delete', message: 'Deletion was not confirmed' });
+  delete: async ({ request, locals, params, cookies }) => {
+    if ((await request.formData()).get('confirmation') !== 'delete')
+      return fail(400, { action: 'delete', message: translate(resolveLocale(cookies.get('lang')), 'server.deleteConfirm') });
     deleteSession(locals.user.id, params.sessionId);
     redirect(303, '/sessions');
   },
