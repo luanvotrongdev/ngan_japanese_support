@@ -1,0 +1,36 @@
+{
+  "name": "ngan-japanese-support",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "scripts": {
+    "dev": "bun --bun vite dev",
+    "build": "bun --bun vite build",
+    "preview": "bun --bun vite preview",
+    "check": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json",
+    "test": "DATABASE_URL=data/test.db bun --bun vitest run --no-file-parallelism",
+    "test:e2e": "playwright test",
+    "db:generate": "drizzle-kit generate",
+    "db:migrate": "bun run src/lib/server/db/migrate.ts"
+  },
+  "dependencies": {
+    "@sveltejs/kit": "latest",
+    "drizzle-orm": "latest",
+    "svelte": "latest",
+    "zod": "latest"
+  },
+  "devDependencies": {
+    "@playwright/test": "latest",
+    "@types/bun": "latest",
+    "@types/node": "latest",
+    "@sveltejs/adapter-node": "latest",
+    "@sveltejs/vite-plugin-svelte": "latest",
+    "drizzle-kit": "latest",
+    "prettier": "latest",
+    "prettier-plugin-svelte": "latest",
+    "svelte-check": "latest",
+    "typescript": "^5.7.0",
+    "vite": "latest",
+    "vitest": "latest"
+  }
+}

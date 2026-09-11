@@ -1,50 +1,66 @@
-# [PROJECT_NAME] Constitution
-<!-- Example: Spec Constitution, TaskFlow Constitution, etc. -->
+<!--
+Sync Impact Report
+- Version change: unratified template -> 1.0.0
+- Added principles: Learning Outcomes First; Linguistic Accuracy and Context;
+  Responsible and Transparent AI; Privacy and Security by Default;
+  Accessible, Tested, and Simple
+- Added sections: Product and Technical Constraints; Development Workflow
+- Removed sections: none
+- Templates: plan/spec/tasks templates retain compatible mandatory sections
+- Follow-up TODOs: none
+-->
+# Ngan Japanese Support Constitution
 
 ## Core Principles
 
-### [PRINCIPLE_1_NAME]
-<!-- Example: I. Library-First -->
-[PRINCIPLE_1_DESCRIPTION]
-<!-- Example: Every feature starts as a standalone library; Libraries must be self-contained, independently testable, documented; Clear purpose required - no organizational-only libraries -->
+### I. Learning Outcomes First
+Every feature MUST serve a defined Japanese-learning outcome. Learning content MUST be
+organized so learners can understand its purpose and revisit it. Engagement-only work
+MUST NOT displace clear explanations, practice, or actionable feedback.
 
-### [PRINCIPLE_2_NAME]
-<!-- Example: II. CLI Interface -->
-[PRINCIPLE_2_DESCRIPTION]
-<!-- Example: Every library exposes functionality via CLI; Text in/out protocol: stdin/args → stdout, errors → stderr; Support JSON + human-readable formats -->
+### II. Linguistic Accuracy and Context
+Japanese content MUST preserve kanji, kana, readings, meanings, usage, nuance, and
+examples without corruption. Ambiguous or context-dependent language MUST be presented
+as such rather than as a universal rule.
 
-### [PRINCIPLE_3_NAME]
-<!-- Example: III. Test-First (NON-NEGOTIABLE) -->
-[PRINCIPLE_3_DESCRIPTION]
-<!-- Example: TDD mandatory: Tests written → User approved → Tests fail → Then implement; Red-Green-Refactor cycle strictly enforced -->
+### III. Responsible and Transparent AI
+AI output MUST be identified as generated guidance and treated as untrusted input.
+Structured output MUST be validated. AI features MUST define timeout, refusal, malformed
+response, retry, and provider-unavailable behavior and MUST NOT fail silently.
 
-### [PRINCIPLE_4_NAME]
-<!-- Example: IV. Integration Testing -->
-[PRINCIPLE_4_DESCRIPTION]
-<!-- Example: Focus areas requiring integration tests: New library contract tests, Contract changes, Inter-service communication, Shared schemas -->
+### IV. Privacy and Security by Default
+Users MUST only access their own learning data. Credentials and tokens MUST remain
+server-side and MUST NOT appear in source control, logs, client bundles, or errors.
+Stored personal data MUST have an identified purpose and deletion behavior.
 
-### [PRINCIPLE_5_NAME]
-<!-- Example: V. Observability, VI. Versioning & Breaking Changes, VII. Simplicity -->
-[PRINCIPLE_5_DESCRIPTION]
-<!-- Example: Text I/O ensures debuggability; Structured logging required; Or: MAJOR.MINOR.BUILD format; Or: Start simple, YAGNI principles -->
+### V. Accessible, Tested, and Simple
+Primary journeys MUST work on desktop and mobile, support keyboard use, and expose clear
+loading, validation, empty, and error states. Ownership boundaries, persistence, grading,
+and external-service boundaries MUST have automated tests. Implementations MUST use the
+simplest design that satisfies current requirements.
 
-## [SECTION_2_NAME]
-<!-- Example: Additional Constraints, Security Requirements, Performance Standards, etc. -->
+## Product and Technical Constraints
 
-[SECTION_2_CONTENT]
-<!-- Example: Technology stack requirements, compliance standards, deployment policies, etc. -->
+- Lessons or study sessions MUST define ownership and structured learning content.
+- User-provided and generated content MUST be validated at server trust boundaries.
+- Features storing user data MUST define authorization and cascading deletion behavior.
+- OpenAI access and credentials MUST pass through server-controlled boundaries.
+- Cost-affecting AI choices MUST be documented in the relevant implementation plan.
+- External provider choices MUST NOT leak into core learning-domain data unnecessarily.
 
-## [SECTION_3_NAME]
-<!-- Example: Development Workflow, Review Process, Quality Gates, etc. -->
+## Development Workflow
 
-[SECTION_3_CONTENT]
-<!-- Example: Code review requirements, testing gates, deployment approval process, etc. -->
+Features MUST proceed through specification, planning, task generation, implementation,
+and verification. The Constitution Check MUST cover learning value, linguistic integrity,
+authorization, privacy, accessibility, tests, and justified complexity. A feature is
+complete only when acceptance scenarios and required automated checks pass.
 
 ## Governance
-<!-- Example: Constitution supersedes all other practices; Amendments require documentation, approval, migration plan -->
 
-[GOVERNANCE_RULES]
-<!-- Example: All PRs/reviews must verify compliance; Complexity must be justified; Use [GUIDANCE_FILE] for runtime development guidance -->
+This constitution supersedes conflicting project conventions. Amendments MUST document
+their reason, migration impact, and synchronized template changes. MAJOR versions remove
+or redefine principles, MINOR versions add or materially expand obligations, and PATCH
+versions clarify wording without changing obligations. Reviews MUST verify compliance;
+exceptions MUST be documented with necessity and a rejected simpler alternative.
 
-**Version**: [CONSTITUTION_VERSION] | **Ratified**: [RATIFICATION_DATE] | **Last Amended**: [LAST_AMENDED_DATE]
-<!-- Example: Version: 2.1.1 | Ratified: 2025-06-13 | Last Amended: 2025-07-16 -->
+**Version**: 1.0.0 | **Ratified**: 2026-09-11 | **Last Amended**: 2026-09-11

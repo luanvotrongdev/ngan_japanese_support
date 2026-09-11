@@ -1,4 +1,4 @@
 <!-- SPECKIT START -->
-For additional context about technologies to be used, project structure,
-shell commands, and other important information, read the current plan
+For the active feature's technologies, structure, commands, and constraints, read
+`specs/001-session-content-management/plan.md`.
 <!-- SPECKIT END -->
