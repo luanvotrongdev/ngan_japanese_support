@@ -1,2 +1,0 @@
-<script lang="ts">import GrammarForm from '$lib/components/GrammarForm.svelte'; let { data, form } = $props();</script>
-<div class="page-shell form-page"><a class="back" href={`/sessions/${data.session.id}`}>Back to {data.session.title}</a><section class="panel"><p class="eyebrow">New pattern</p><h1>Add grammar</h1><form method="POST"><GrammarForm values={form?.values} errors={form?.errors} /></form></section></div>

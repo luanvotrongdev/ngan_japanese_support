@@ -11,8 +11,10 @@ type Input = z.infer<typeof kanjiSchema>;
 export function createKanji(userId: string, sessionId: string, input: Input) {
   requireOwnedSession(userId, sessionId);
   const now = new Date();
-  db.insert(kanji).values({ id: crypto.randomUUID(), studySessionId: sessionId, ...input, createdAt: now, updatedAt: now }).run();
+  const id = crypto.randomUUID();
+  db.insert(kanji).values({ id, studySessionId: sessionId, ...input, createdAt: now, updatedAt: now }).run();
   touchSession(sessionId);
+  return id;
 }
 
 export function getKanji(userId: string, sessionId: string, id: string) {

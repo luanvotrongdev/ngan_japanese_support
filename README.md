@@ -1,7 +1,9 @@
 # Ngan Japanese Support
 
 A SvelteKit application for organizing Japanese study sessions and their vocabulary,
-kanji, and grammar notes.
+kanji, and grammar notes. Each session opens on a single master-detail page that combines
+vocabulary, kanji, and grammar entries in one type-badged list with an inline detail/edit
+form, so all content types are managed and viewed in the same screen.
 
 ## Setup
 

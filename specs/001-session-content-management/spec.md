@@ -5,6 +5,12 @@
 **Status**: Approved
 **Input**: Build session management for Japanese lessons with vocabulary, kanji, and grammar content using SQLite.
 
+## Clarifications
+### Session 2026-09-11
+- Q: How should Vocabulary, Kanji, and Grammar be arranged on the screen? → A: Single page with master-detail (list on left, detail on right)
+- Q: How should error, empty, and loading states be presented to the user? → A: Inline display for all states (validation errors, empty placeholders, loading indicators within the same area)
+- Q: How should the master list combine the three content types? → A: Combined list with type badge/tag on each entry
+
 ## User Scenarios & Testing *(mandatory)*
 
 ### User Story 1 - Manage Study Sessions (Priority: P1)
@@ -59,6 +65,15 @@ A learner manages grammar patterns with usage, meaning, nuance, and ordered exam
 - Empty list items are discarded while order is retained.
 - Unicode Japanese text is stored and displayed unchanged.
 - Deleting a session cascades to all three content types.
+
+### Screen Hierarchy
+- The application will use a single page with a master-detail layout for managing and viewing Vocabulary, Kanji, and Grammar content within a session. The list of entries (master) will be on the left, and the detail/edit form (detail) will be on the right.
+- The master list will combine all three content types into a single list, with each entry showing a type badge (Vocabulary, Kanji, or Grammar).
+
+### Error Handling
+- Validation errors for required fields will be displayed inline, directly below each respective field, with clear, actionable messages.
+- Empty states (no entries for a content type) will show a helpful placeholder prompting the user to add the first entry.
+- Loading states for asynchronous operations (e.g., saving, deleting) will be indicated by subtle inline spinners or disabled buttons to prevent duplicate submissions.
 
 ## Requirements *(mandatory)*
 

@@ -1,2 +1,0 @@
-<script lang="ts">import VocabularyForm from '$lib/components/VocabularyForm.svelte'; let { data, form } = $props();</script>
-<div class="page-shell form-page"><a class="back" href={`/sessions/${data.session.id}`}>Back to {data.session.title}</a><section class="panel"><p class="eyebrow">New word</p><h1>Add vocabulary</h1><form method="POST"><VocabularyForm values={form?.values} errors={form?.errors} /></form></section></div>

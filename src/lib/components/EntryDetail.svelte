@@ -1,0 +1,68 @@
+<script lang="ts">
+  import VocabularyFields from './VocabularyFields.svelte';
+  import KanjiFields from './KanjiFields.svelte';
+  import GrammarFields from './GrammarFields.svelte';
+  import { toLines } from '$lib/schemas/learning-content';
+
+  type ContentType = 'vocabulary' | 'kanji' | 'grammar';
+  type FormState = {
+    action?: string;
+    entryId?: string;
+    message?: string;
+    values?: Record<string, unknown>;
+    errors?: Record<string, string[]>;
+  };
+
+  let { type, mode, id, entry, form }: {
+    type: ContentType;
+    mode: 'new' | 'edit';
+    id: string | null;
+    entry: Record<string, any> | null;
+    form: FormState | null;
+  } = $props();
+
+  const badge: Record<ContentType, string> = { vocabulary: 'Vocabulary', kanji: 'Kanji', grammar: 'Grammar' };
+  const action = $derived(`${type}/${mode === 'new' ? 'create' : 'update'}`);
+  let busy = $state(false);
+
+  const values = $derived.by(() => {
+    if (form && (mode === 'edit' ? form.entryId === id : !form.entryId)) return form.values ?? {};
+    if (mode === 'edit' && entry) {
+      if (type === 'vocabulary') return { ...entry, examples: toLines(entry.examples) };
+      if (type === 'kanji') return { ...entry, onyomi: toLines(entry.onyomi), kunyomi: toLines(entry.kunyomi), relatedVocabulary: toLines(entry.relatedVocabulary), examples: toLines(entry.examples) };
+      if (type === 'grammar') return { ...entry, examples: toLines(entry.examples) };
+    }
+    return {};
+  });
+  const errors = $derived(form?.action?.startsWith(`${type}/`) ? (form?.errors ?? {}) : {});
+
+  function submit() { busy = true; }
+  function confirmDelete(event: SubmitEvent) {
+    if (!confirm(`Delete this ${badge[type].toLowerCase()} entry?`)) event.preventDefault();
+    else busy = true;
+  }
+</script>
+
+<div class="detail-panel-inner">
+  <p class="eyebrow">{badge[type]}</p>
+  <h2>{mode === 'new' ? `Add ${badge[type].toLowerCase()}` : `Edit ${badge[type].toLowerCase()}`}</h2>
+  <form method="POST" action={`?/${action}`} onsubmit={submit}>
+    {#if mode === 'edit'}<input type="hidden" name="entryId" value={id ?? ''} />{/if}
+    {#if type === 'vocabulary'}
+      <VocabularyFields {values} {errors} />
+    {:else if type === 'kanji'}
+      <KanjiFields {values} {errors} />
+    {:else}
+      <GrammarFields {values} {errors} />
+    {/if}
+    <button class="primary" type="submit" disabled={busy}>{mode === 'new' ? 'Add entry' : 'Save changes'}</button>
+  </form>
+  {#if mode === 'edit'}
+    <form method="POST" action={`?/${type}/delete`} onsubmit={confirmDelete}>
+      <input type="hidden" name="entryId" value={id ?? ''} />
+      <input type="hidden" name="confirmation" value="delete" />
+      {#if form?.action === `${type}/delete` && form?.message}<p class="field-error">{form.message}</p>{/if}
+      <button class="danger" type="submit" disabled={busy}>Delete {badge[type].toLowerCase()}</button>
+    </form>
+  {/if}
+</div>

@@ -11,8 +11,10 @@ type Input = z.infer<typeof vocabularySchema>;
 export function createVocabulary(userId: string, sessionId: string, input: Input) {
   requireOwnedSession(userId, sessionId);
   const now = new Date();
-  db.insert(vocabulary).values({ id: crypto.randomUUID(), studySessionId: sessionId, ...input, createdAt: now, updatedAt: now }).run();
+  const id = crypto.randomUUID();
+  db.insert(vocabulary).values({ id, studySessionId: sessionId, ...input, createdAt: now, updatedAt: now }).run();
   touchSession(sessionId);
+  return id;
 }
 
 export function getVocabulary(userId: string, sessionId: string, id: string) {

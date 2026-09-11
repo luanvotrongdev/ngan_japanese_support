@@ -1,2 +1,0 @@
-<script lang="ts">import KanjiForm from '$lib/components/KanjiForm.svelte'; let { data, form } = $props();</script>
-<div class="page-shell form-page"><a class="back" href={`/sessions/${data.session.id}`}>Back to {data.session.title}</a><section class="panel"><p class="eyebrow">New character</p><h1>Add kanji</h1><form method="POST"><KanjiForm values={form?.values} errors={form?.errors} /></form></section></div>

@@ -11,8 +11,10 @@ type Input = z.infer<typeof grammarSchema>;
 export function createGrammar(userId: string, sessionId: string, input: Input) {
   requireOwnedSession(userId, sessionId);
   const now = new Date();
-  db.insert(grammar).values({ id: crypto.randomUUID(), studySessionId: sessionId, ...input, createdAt: now, updatedAt: now }).run();
+  const id = crypto.randomUUID();
+  db.insert(grammar).values({ id, studySessionId: sessionId, ...input, createdAt: now, updatedAt: now }).run();
   touchSession(sessionId);
+  return id;
 }
 
 export function getGrammar(userId: string, sessionId: string, id: string) {

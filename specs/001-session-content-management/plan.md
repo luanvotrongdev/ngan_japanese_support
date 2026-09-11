@@ -6,7 +6,10 @@
 
 Build a full-stack SvelteKit application for private CRUD management of lesson-like study
 sessions and their vocabulary, kanji, and grammar. Use Bun, strict TypeScript, Drizzle,
-and SQLite on one server with persistent storage.
+and SQLite on one server with persistent storage. A flat master-detail page inside each
+session shows one combined list of vocabulary, kanji, and grammar entries (each carrying a
+type badge) on the left and an inline detail/edit form on the right, so all content types
+are managed and viewed in the same screen (spec: Screen Hierarchy).
 
 ## Technical Context
 
@@ -37,8 +40,10 @@ temporary local user isolated behind an auth boundary
 - Linguistic integrity: PASS - all supplied fields and ordered Japanese text are preserved.
 - AI safety: PASS - no AI behavior exists in this feature.
 - Privacy/security: PASS - all database access is scoped through the owning user.
-- Accessibility/testing/simplicity: PASS - progressive forms, keyboard-safe controls, and
-  automated ownership, persistence, and CRUD tests are planned.
+- Accessibility/testing/simplicity: PASS - single master-detail page with a combined,
+  type-badged content list and inline error, empty, and loading states keeps every content
+  type reachable on one screen (spec: Screen Hierarchy, Error Handling); forms are
+  progressive and keyboard-safe; automated ownership, persistence, and CRUD tests are planned.
 
 ## Project Structure
 
@@ -65,12 +70,18 @@ src/
 ├── hooks.server.ts
 ├── lib/
 │   ├── components/
+│   │   ├── ContentList.svelte
+│   │   ├── EntryDetail.svelte
+│   │   ├── VocabularyFields.svelte
+│   │   ├── KanjiFields.svelte
+│   │   └── GrammarFields.svelte
 │   ├── schemas/
 │   └── server/
 │       ├── db/
 │       └── study-sessions/
 └── routes/
     └── sessions/
+        └── [sessionId]/
 tests/
 ├── integration/
 └── unit/
