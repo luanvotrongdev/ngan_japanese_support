@@ -17,3 +17,14 @@ Thumbs.db
 *.swp
 .vscode/
 .idea/
+
+# Tauri / desktop host
+src-tauri/target/
+src-tauri/gen/
+src-tauri/binaries/**
+!src-tauri/binaries/.gitkeep
+src-tauri/icons/named/
+src-tauri/*.key
+src-tauri/.signing/
+desktop/app-icon.png
+desktop/*.svg.png
