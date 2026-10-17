@@ -26,3 +26,20 @@ describe('study sessions', () => {
     expect(db.select().from(vocabulary).where(eq(vocabulary.studySessionId, session.id)).all()).toHaveLength(0);
   });
 });
+
+describe('content writes', () => {
+  test('bump the session updated time in the same transaction', () => {
+    const session = createSession('owner', { title: 'Touch', notes: null });
+    const before = getSession('owner', session.id).updatedAt.getTime();
+    createVocabulary('owner', session.id, {
+      vocabulary: '水', reading: 'みず', meaning: 'water', nuance: null, examples: []
+    });
+    expect(getSession('owner', session.id).updatedAt.getTime()).toBeGreaterThanOrEqual(before);
+  });
+
+  test('missing sessions throw a localizable 404', () => {
+    expect(() => getSession('owner', 'missing')).toThrow(expect.objectContaining({
+      status: 404, body: { message: 'notFound.session' }
+    }));
+  });
+});

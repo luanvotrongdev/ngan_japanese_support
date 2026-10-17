@@ -26,6 +26,7 @@ export const dictionaries = {
   'library.title': { vi: 'Các buổi học', en: 'Study sessions' },
   'library.total': { vi: '{count} buổi', en: '{count} total' },
   'library.updated': { vi: 'Cập nhật {date}', en: 'Updated {date}' },
+  'library.created': { vi: 'Tạo {date}', en: 'Created {date}' },
   'library.noNotes': { vi: 'Chưa có ghi chú', en: 'No notes yet' },
   'library.open': { vi: 'Mở buổi học', en: 'Open session' },
   'library.empty': {
@@ -37,6 +38,7 @@ export const dictionaries = {
   'detail.eyebrow': { vi: 'Buổi học', en: 'Study session' },
   'detail.noNotes': { vi: 'Chưa có ghi chú cho buổi học này.', en: 'No notes for this session.' },
   'detail.updated': { vi: 'Cập nhật {date}', en: 'Updated {date}' },
+  'detail.created': { vi: 'Tạo {date}', en: 'Created {date}' },
   'edit.title': { vi: 'Chỉnh sửa thông tin buổi học', en: 'Edit session details' },
   'detail.empty.eyebrow': { vi: 'Chi tiết mục', en: 'Entry details' },
   'detail.empty.title': { vi: 'Chưa chọn mục nào', en: 'Nothing selected' },
@@ -104,7 +106,14 @@ export const dictionaries = {
 
   'error.required': { vi: 'Hãy nhập {field}', en: '{field} is required' },
   'error.tooLong': { vi: '{field} quá dài', en: '{field} is too long' },
-  'server.deleteConfirm': { vi: 'Chưa xác nhận việc xóa', en: 'Deletion was not confirmed' }
+  'server.deleteConfirm': { vi: 'Chưa xác nhận việc xóa', en: 'Deletion was not confirmed' },
+
+  'notFound.session': { vi: 'Không tìm thấy buổi học', en: 'Study session not found' },
+  'notFound.vocabulary': { vi: 'Không tìm thấy từ vựng', en: 'Vocabulary not found' },
+  'notFound.kanji': { vi: 'Không tìm thấy chữ Hán', en: 'Kanji not found' },
+  'notFound.grammar': { vi: 'Không tìm thấy ngữ pháp', en: 'Grammar not found' },
+  'errorPage.title': { vi: 'Đã xảy ra lỗi', en: 'Something went wrong' },
+  'errorPage.back': { vi: 'Quay lại các buổi học', en: 'Back to sessions' }
 } as const;
 
 export type DictionaryKey = keyof typeof dictionaries;
