@@ -10,8 +10,8 @@ This README is the project's single source of documentation. Update it whenever 
 data, or routes change.
 
 > **Platform scope**: the long-term goal is Web, macOS, Windows, Android, and iOS. The current
-> build is a server-rendered web app only (SvelteKit + `adapter-node`); no desktop or mobile
-> shell exists yet.
+> build is a server-rendered web app (SvelteKit + `adapter-node`) plus an experimental Tauri 2
+> desktop shell (see [Desktop shell](#desktop-shell-experimental)); no mobile shell exists yet.
 
 ## Contents
 
@@ -49,6 +49,25 @@ directory is created automatically.
 | `bun run test:e2e` | Playwright journeys; migrates and serves `data/e2e.db` on port 4173 |
 | `bun run db:generate` | Generate a Drizzle migration after editing `schema.ts` |
 | `bun run db:migrate` | Apply migrations in `drizzle/` |
+
+### Desktop shell (experimental)
+
+`desktop/` and `src-tauri/` wrap the app in a Tauri 2 window. The Rust shell starts a
+Bun-compiled sidecar (`session-server`) that applies migrations, serves the SvelteKit
+`adapter-node` handler on a random `127.0.0.1` port, and prints `READY <port>`; the window
+then navigates to that URL. There are no `package.json` scripts for this yet, and
+`tauri.conf.json` has `beforeBuildCommand: "true"`, so the steps run by hand:
+
+```sh
+bun run build                  # SvelteKit build into build/
+bun desktop/patch-env.ts       # make build/env.js resolve assets from the working directory
+bun desktop/build-sidecar.ts   # compile src-tauri/binaries/session-server-<triple> (Bun >= 1.4; --all for every target)
+bun desktop/smoke-sidecar.ts   # optional: boot the sidecar on a temp DB and check GET/asset/POST
+bunx tauri build               # or `bunx tauri dev`; needs Rust/Cargo
+```
+
+`@tauri-apps/cli` is installed locally but not listed in `package.json`. See
+[Limitations and backlog](#limitations-and-backlog) for what keeps this from being distributable.
 
 ### Manual smoke test
 
@@ -107,8 +126,8 @@ directory is created automatically.
   first entry; entry-form buttons are disabled while saving.
 
 ### Out of scope (for now)
-Authentication, quiz generation, grading, AI content generation, progress tracking, and
-native desktop/mobile packaging.
+Authentication, quiz generation, grading, AI content generation, progress tracking,
+mobile packaging, and distributable desktop releases.
 
 ## Architecture
 
@@ -120,6 +139,9 @@ native desktop/mobile packaging.
 - **Validation**: Zod schemas at the server boundary.
 - **Identity**: a fixed `local-user` set in `src/hooks.server.ts` (upserted on every request).
   This is the auth boundary to replace before multi-user or public deployment.
+- **Desktop (experimental)**: Tauri 2 (`tauri-plugin-shell` for the sidecar,
+  `tauri-plugin-updater` configured with placeholders) around a Bun-compiled sidecar
+  that embeds `drizzle/` and serves `build/handler.js`.
 
 ```text
 src/
@@ -135,9 +157,11 @@ src/
     ├── sessions/              # session list + create
     ├── sessions/[sessionId]/  # master-detail page + all content form actions
     └── set-language/          # POST-only language toggle endpoint
-tests/   # Vitest: integration (DB) + unit (i18n)
-e2e/     # Playwright journeys
-drizzle/ # generated SQL migrations
+tests/     # Vitest: integration (DB) + unit (i18n)
+e2e/       # Playwright journeys
+drizzle/   # generated SQL migrations
+desktop/   # sidecar entry, build, smoke-test, and build/env.js patch scripts
+src-tauri/ # Tauri 2 shell (Rust); compiled sidecars go in binaries/
 ```
 
 Every query goes through `requireOwnedSession()` in `src/lib/server/study-sessions/shared.ts`;
@@ -230,6 +254,10 @@ layout server files. Any `lang` other than `en` resolves to `vi`. The cookie is 
 | Integration (Vitest) | `tests/integration/` | session CRUD and cascade delete, ownership checks, ordered lists for each content type, session bump on content writes, localizable 404 keys |
 | Unit (Vitest) | `tests/unit/i18n.test.ts` | dictionary coverage, locale resolution, fallback, interpolation, error localization, not-found keys |
 | Browser (Playwright) | `e2e/` | full CRUD journey on one session page; Vietnamese default and English toggle; localized validation; localized session delete confirmation |
+| Desktop sidecar smoke | `desktop/smoke-sidecar.ts` | compiled sidecar boots on a temp DB, prints `READY`, serves `/sessions` and an immutable asset, accepts the `/set-language` POST, applies migrations (macOS/Windows hosts) |
+
+`e2e/example.spec.ts` is Playwright's generated scaffold; it visits playwright.dev, so it
+needs network access and does not test this app.
 
 `tests/setup.ts` migrates the test database and resets it with `owner`/`other` users before
 each test.
@@ -251,6 +279,8 @@ localized 404 page were smoke-tested in a browser. `test:e2e` starts its server 
   translate learner content.
 - **Single master-detail page** over separate pages per content type: everything for a session
   is visible and editable in one place.
+- **Tauri + local server sidecar** for desktop over a static/SPA build: the app keeps its
+  server form actions and `bun:sqlite` storage unchanged; the shell only hosts a window.
 
 ## Limitations and backlog
 
@@ -263,4 +293,15 @@ localized 404 page were smoke-tested in a browser. `test:e2e` starts its server 
 - [x] Add a `.gitattributes` line-ending policy (`* text=auto eol=lf`). Existing checkouts
   may need `git add --renormalize .` once.
 - [ ] Replace the fixed `local-user` identity with real authentication.
-- [ ] Plan the desktop/mobile packaging for macOS, Windows, Android, and iOS.
+- [ ] Plan mobile packaging for Android and iOS.
+- [ ] Make the desktop shell distributable:
+  - The sidecar's working directory is the repo root baked in at compile time
+    (`CARGO_MANIFEST_DIR`), and `patch-env.ts` makes it serve assets from `<cwd>/build`, so a
+    built app only works on the machine that built it with the repo present.
+  - `DATABASE_URL` is not set by the shell, so the database lands in `<repo>/data/`; it should
+    move to the OS app-data directory.
+  - `src-tauri/data/japanese-support.db*` is committed to git (`.gitignore` only covers
+    `data/*.db` at the root).
+  - Updater `pubkey` and endpoint (`OWNER/REPO`) are placeholders.
+  - Add `desktop:*` scripts and `@tauri-apps/cli` to `package.json`, and wire
+    `beforeBuildCommand`.
