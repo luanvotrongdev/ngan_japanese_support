@@ -96,3 +96,4 @@ label em.error { color: #a23e32; font-size: .8rem; font-style: normal; font-weig
   .session-heading, .danger-zone { align-items: flex-start; flex-direction: column; }
   .content-section > header { align-items: flex-start; }
 }
+.date p { margin: 0; }

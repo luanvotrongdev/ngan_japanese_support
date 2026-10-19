@@ -81,3 +81,9 @@ describe('localizeErrors', () => {
     });
   });
 });
+describe('not-found messages', () => {
+  it('translates repository not-found keys', () => {
+    expect(translate('en', 'notFound.session')).toBe('Study session not found');
+    expect(translate('vi', 'notFound.session')).toBe('Không tìm thấy buổi học');
+  });
+});
